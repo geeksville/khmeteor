@@ -1,5 +1,3 @@
-const Snoocore = Meteor.npmRequire('snoocore')
-
 function dumpLink(l) {
   logger.debug(`${l.name}: ${l.title}`)
 }
@@ -15,13 +13,12 @@ function throwRedditException(status, message) {
  returns an array of listing objects
 */
 function flattenListing(l) {
-  if(l instanceof Array) {
-    const arrays = l.map( c => flattenListing(c) )
+  if (l instanceof Array) {
+    const arrays = l.map(c => flattenListing(c))
 
     // Now flatten those arrays into one single array
     return _.flatten(arrays)
-  }
-  else {
+  } else {
     // Reddit might return null here
     return (l && l.data && l.data.children) ? l.data.children : [] // Listings as an array of { kind, data }
   }
@@ -35,6 +32,7 @@ RedditClient = class RedditClient {
 
   connectToReddit() {
     const auth = JSON.parse(Assets.getText("reddit_auth_secret.json"))
+    const Snoocore = Meteor.npmRequire('snoocore')
     this.reddit = new Snoocore({
       userAgent: '/u/punkgeek fixme@0.1.0',
       throttle: 0, // Go as fast as reddit will let us...
@@ -48,8 +46,8 @@ RedditClient = class RedditClient {
         username: auth.username,
         password: auth.password,
         //duration: 'permanent', // defaults to 'temporary'
-        scope: [ 'read', 'history' ] // history needed to read user cmts
-        // Does not have a deviceId!
+        scope: ['read', 'history'] // history needed to read user cmts
+          // Does not have a deviceId!
       }
     })
   }
@@ -57,20 +55,20 @@ RedditClient = class RedditClient {
   /** subreddit can be null, /r/tifu or /u/punkgeek */
   query(path, subreddit = null, options = {}) {
 
-    if(typeof subreddit == "undefined")
+    if (typeof subreddit == "undefined")
       throw new Meteor.Error(500, 'Error 500: We used undefined subreddit')
 
     // If someone asks for /r/reddit, instead go to the base of the tree
     // really old comments might reference reddit.com as the subreddit
-    if(subreddit === "/r/reddit" || subreddit === "/r/reddit.com")
+    if (subreddit === "/r/reddit" || subreddit === "/r/reddit.com")
       subreddit = null
 
     var redditprefix
-    if(subreddit == null)
+    if (subreddit == null)
       redditprefix = ''
-    else if(subreddit.startsWith("/r/"))
+    else if (subreddit.startsWith("/r/"))
       redditprefix = subreddit.substring(1)
-    else if(subreddit.startsWith("/u/"))
+    else if (subreddit.startsWith("/u/"))
       redditprefix = "user/" + subreddit.substring(3)
     else
       throw new Meteor.Error(404, 'Error 404: Invalid name ' + subreddit, 'must be /r or /u')
@@ -97,26 +95,24 @@ RedditClient = class RedditClient {
       })
     }
 
-    while(true) {
+    while (true) {
       const data = callReddit()
 
-      if(data.error) {
-        if(data.error.status = 401) {
-          if(retriesRemaining) {
+      if (data.error) {
+        if (data.error.status = 401) {
+          if (retriesRemaining) {
             retriesRemaining -= 1
             logger.error("Reddit returned unauthorized - FIXME, reconnecting", fullpath)
             this.connectToReddit()
             continue // Try again (instead of returning)
-          }
-          else {
+          } else {
             logger.error("Reddit returned unauthorized - out of retries!", fullpath, data.error)
           }
-        }
-        else if(data.error.status = 403)
+        } else if (data.error.status = 403)
           logger.warn("Reddit returned forbidden", fullpath)
-        else if(data.error.status = 404)
+        else if (data.error.status = 404)
           logger.warn("Reddit returned not found", fullpath)
-        else if(data.error.status = 503)
+        else if (data.error.status = 503)
           logger.warn("Reddit returned svc unavailable", fullpath)
         else
           logger.error("Reddit returned unexpected error", fullpath, data.error)
@@ -131,15 +127,14 @@ RedditClient = class RedditClient {
 
   getListings(path, subreddit, kind = null, options = {}) {
     const qres = this.query(path, subreddit, options = options)
-    // FIXME - support paging through listings eventually
+      // FIXME - support paging through listings eventually
 
     let listings = flattenListing(qres)
-    if(kind != null)
+    if (kind != null)
       listings = _.filter(listings, l => l.kind == kind)
 
     return listings
   }
-
 
   /**
    Used for reading lists of top level reddit posts
@@ -151,13 +146,13 @@ RedditClient = class RedditClient {
 
     const listings = this.getListings(path, subreddit, kind = null, options = options)
 
-    if(!listings.length) {
+    if (!listings.length) {
       logger.error(`Error, empty link list`, subreddit)
       throw new Meteor.Error(404, 'Error 404: Subreddit Not found', 'empty listings')
     }
 
     // FIXME - confirm that all types are t3
-    const res = listings.map( l => {
+    const res = listings.map(l => {
       const lres = l.data
 
       // Preextract the article id to make usage by others easier (remove t3_)
@@ -230,15 +225,17 @@ I20151126-10:18:50.806(-10)?      user_is_subscriber: null } }
   getAbout(subreddit, options = {}) {
     const res = this.query("about", subreddit, options = options)
 
-    if(!res || !res.data || !res.data.id) {
-     logger.error(`Error, empty data for ${subreddit} about`)
-     throw new Meteor.Error(404, 'Error 404: Subreddit Not found', 'that subreddit/about does not exist')
+    if (!res || !res.data || !res.data.id) {
+      logger.error(`Error, empty data for ${subreddit} about`)
+      throw new Meteor.Error(404, 'Error 404: Subreddit Not found', 'that subreddit/about does not exist')
     }
 
     return res
   }
 
-  getMe() { return this.query("api/v1/me") }
+  getMe() {
+    return this.query("api/v1/me")
+  }
 
   /**
   Return a flat listing of only the comment results (and discard any tree heirarchy)
@@ -290,6 +287,8 @@ I20151208-17:19:17.001(-8)?   distinguished: null }
   */
   getUserComments(username, sort = "new") {
     return this.getListings(`comments`,
-      subreddit = username, kind = null, options = { sort: sort }).map(l => l.data)
+      subreddit = username, kind = null, options = {
+        sort: sort
+      }).map(l => l.data)
   }
 }
