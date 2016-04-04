@@ -7,7 +7,7 @@ OpenSheet = function (sheetId, auth) {
   // Some methods return complex objects
   asyncMetaWrap(inst, 'getRows', ['save', 'del'])
   asyncMetaWrap(inst, 'getCells', ['save', 'del', 'setValue', 'getValueForSave'])
-  const wrapped = Async.wrap(inst, ['useServiceAccountAuth', 'getRows', 'getInfo', 'getCells', 'bulkUpdateCells', 'addWorksheet' /*, 'deleteWorksheet' */ ])
+  const wrapped = Async.wrap(inst, ['useServiceAccountAuth', 'getRows', 'addRow', 'getInfo', 'getCells', 'bulkUpdateCells', 'addWorksheet' /*, 'deleteWorksheet' */ ])
 
   const creds = JSON.parse(Assets.getText("google-sheets-creds.json"))
   wrapped.useServiceAccountAuth(creds)

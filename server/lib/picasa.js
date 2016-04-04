@@ -23,7 +23,7 @@ getPhotos results look like:
   height: '3120',
   size: '1351112',
   checksum: '',
-  timestamp: '1455663484000',
+  timestamp: '1455663484000', // NOTE: Timestamp is in UTC
   image_version: '28046',
   commenting_enabled: 'true',
   comment_count: 0,
