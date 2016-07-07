@@ -3,10 +3,11 @@
 // from npm/picasa - temporarily here because it needs ES6.  eventually merge back upstream - FIXME
 
 const querystring = Meteor.npmRequire('querystring')
-const request = Meteor.npmRequire('request')
 
 //const executeRequest = Npm.require('./executeRequest')
 function executeRequest(method, requestOptions, callback) {
+  const request = Meteor.npmRequire('request')
+
   request[method](requestOptions, (error, response, body) => {
     if (error) return callback(error)
 
