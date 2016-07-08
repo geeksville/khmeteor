@@ -32,7 +32,7 @@ RedditClient = class RedditClient {
 
   connectToReddit() {
     const auth = JSON.parse(Assets.getText("reddit_auth_secret.json"))
-    const Snoocore = Meteor.npmRequire('snoocore')
+    import Snoocore from 'snoocore'
     this.reddit = new Snoocore({
       userAgent: '/u/punkgeek fixme@0.1.0',
       throttle: 0, // Go as fast as reddit will let us...

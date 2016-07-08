@@ -1,5 +1,5 @@
 OpenSheet = function (sheetId, auth) {
-  const NodeSpreadsheet = Meteor.npmRequire('google-spreadsheet')
+  import NodeSpreadsheet from 'google-spreadsheet'
 
   // Use user.services.google.accessToken
   const inst = new NodeSpreadsheet(sheetId)
