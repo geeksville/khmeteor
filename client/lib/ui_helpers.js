@@ -18,7 +18,15 @@ UI.registerHelper('toBool', (v1) => (!!v1))
 
 UI.registerHelper('session', (input) => Session.get(input))
 
-UI.registerHelper('findOne', (collectionName) => window[collectionName].findOne())
+/**
+ Useful to easily find one object from the named collection, id is optional */
+UI.registerHelper('findOne', (collectionName, id = null) => {
+  logger.debug('findOne', id)
+  const query = id ? {
+    _id: id
+  } : {}
+  return window[collectionName].findOne(query)
+})
 
 UI.registerHelper('getParam', (paramName) => getFlowParam(paramName))
 
