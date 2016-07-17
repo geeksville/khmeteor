@@ -21,11 +21,25 @@ UI.registerHelper('session', (input) => Session.get(input))
 /**
  Useful to easily find one object from the named collection, id is optional */
 UI.registerHelper('findOne', (collectionName, id = null) => {
-  logger.debug('findOne', id)
+  logger.debug('findOne', collectionName, id)
   const query = id ? {
     _id: id
   } : {}
   return window[collectionName].findOne(query)
+})
+
+/**
+ Find multiple objects in a collection */
+UI.registerHelper('find', (collectionName) => {
+  logger.debug('find', collectionName)
+  return window[collectionName].find()
+})
+
+let oldId = 0
+  /** generate a unique string which can be used as an ID */
+UI.registerHelper('uniqueId', () => {
+  oldId += 1
+  return "uniqueId" + oldId
 })
 
 UI.registerHelper('getParam', (paramName) => getFlowParam(paramName))
