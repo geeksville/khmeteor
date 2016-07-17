@@ -18,6 +18,8 @@ UI.registerHelper('toBool', (v1) => (!!v1))
 
 UI.registerHelper('session', (input) => Session.get(input))
 
+UI.registerHelper('findOne', (collectionName) => window[collectionName].findOne())
+
 UI.registerHelper('getParam', (paramName) => getFlowParam(paramName))
 
 UI.registerHelper('startsWith', (str, prefix) => str.startsWith(prefix))
@@ -37,12 +39,9 @@ UI.registerHelper('activeByRoute', (...names) => {
   const routeName = FlowRouter.getRouteName()
   logger.trace("Current route name is: ", routeName)
 
-  if (names.indexOf(routeName) >= 0)
-    return {
-      class: "active"
-    }
-  else
-    return {}
+  return (names.indexOf(routeName) >= 0) ? {
+    class: "active"
+  } : {}
 })
 
 // Return bootstrap style 'active' css labels based on path name -
@@ -51,12 +50,9 @@ UI.registerHelper('activeByPath', (...names) => {
   const path = FlowRouter.current().path
   logger.debug("Current path is: ", path)
 
-  if (names.find(n => path.startsWith(n)))
-    return {
-      class: "active"
-    }
-  else
-    return {}
+  return (names.find(n => path.startsWith(n))) ? {
+    class: "active"
+  } : {}
 })
 
 // FIXME - it seems that sometimes early on params will come back as undefined
@@ -83,10 +79,7 @@ UI.registerHelper('activeByParam', (paramName, ...names) => {
   if (!path)
     return {}
 
-  if (names.find(n => path.startsWith(n)))
-    return {
-      class: "active"
-    }
-  else
-    return {}
+  return (names.find(n => path.startsWith(n))) ? {
+    class: "active"
+  } : {}
 })
