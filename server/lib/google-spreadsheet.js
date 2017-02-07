@@ -7,8 +7,9 @@ OpenSheet = function (sheetId, auth) {
   // Some methods return complex objects
   asyncMetaWrap(inst, 'getRows', ['save', 'del'])
   asyncMetaWrap(inst, 'getCells', ['save', 'del', 'setValue', 'getValueForSave'])
-    // FIXME - missing 'bulkUpdateCells', 
+    // FIXME - missing 'bulkUpdateCells',
   const wrapped = Async.wrap(inst, ['useServiceAccountAuth', 'getRows', 'addRow', 'getInfo', 'getCells', 'addWorksheet' /*, 'deleteWorksheet' */ ])
+  wrapped.unwrapped = inst // To allow raw async level access
 
   const creds = JSON.parse(Assets.getText("google-sheets-creds.json"))
   wrapped.useServiceAccountAuth(creds)
